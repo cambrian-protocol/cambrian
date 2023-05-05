@@ -1,11 +1,10 @@
-import { Box, Image } from 'grommet'
+import { Box, Button, Image } from 'grommet'
 
 import BaseContentSection from '@cambrian/app/components/sections/BaseContentSection'
 import EnderSection from '@cambrian/app/components/sections/EnderSection'
 import FadeIn from '@cambrian/app/animations/FadeIn'
 import Glow from '@cambrian/app/components/branding/Glow'
 import IndexHeaderSection from '@cambrian/app/components/sections/IndexHeaderSection'
-import LogoButton from '@cambrian/app/components/buttons/LogoButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PainPointSection from '@cambrian/app/components/sections/PainPointSection'
 import { Text } from 'grommet'
@@ -41,18 +40,29 @@ export default function Home() {
                         <Glow
                             height="1000px"
                             width="1000px"
-                            left={'-20%'}
+                            left={'20%'}
                             bottom={'60%'}
                         />
-
-                        <Box style={{ position: 'relative' }} id={'start'}>
+                        <Glow
+                            height="1500px"
+                            width="1500px"
+                            left={'-30%'}
+                            bottom={'25%'}
+                        />
+                        <Glow
+                            height="2000px"
+                            width="2000px"
+                            left={'10%'}
+                            bottom={'5%'}
+                        />
+                        <Box style={{ position: 'relative' }}>
                             <PainPointSection />
                             <USPListSection />
                             <BaseContentSection
                                 align="right"
                                 title={'Solvers'}
                                 subTitle={'Technical Interoperability'}
-                                paragraph="Solvers are escrow smart contracts that manage on-chain transactions based on specific conditions. They are programmable and customizable, allowing for a wide range of applications and integration with other smart contracts and blockchains. Solvers make complex transactions easier to manage and enable automation and innovation in a decentralized ecosystem."
+                                paragraph="Solvers are customizable smart contracts that enable on-chain transactions, integrate with other smart contracts and blockchains, automate and innovate, and simplify complex transactions in a decentralized ecosystem."
                                 image={
                                     <FadeIn direction="X" distance="-10%">
                                         <Box round="xsmall" overflow="hidden">
@@ -64,12 +74,20 @@ export default function Home() {
                                         </Box>
                                     </FadeIn>
                                 }
-                                anchor={<></>}
+                                anchor={
+                                    <Box align="start">
+                                        <Button
+                                            secondary
+                                            label="Read Docs"
+                                            href="https://www.notion.so/cambrianprotocol/Solver-Technical-Brief-63aaed27292648e19f7b0e30418fca08?pvs=4"
+                                        ></Button>
+                                    </Box>
+                                }
                             />
                             <BaseContentSection
                                 title={'AI Real-Time Matching*'}
                                 subTitle={'Informational Interoperability'}
-                                paragraph="AI-powered candidate and job real-time matching revolutionizes the hiring process by analyzing and comparing job requirements and candidate profiles in an instant. By leveraging advanced algorithms and machine learning techniques, this innovative approach identifies the most suitable matches between job seekers and available positions, streamlining the recruitment process, reducing time-to-hire, and ensuring that the right talent is connected with the right opportunity."
+                                paragraph="AI-based candidate and job matching uses advanced algorithms and machine learning to instantly analyze job requirements and candidate profiles, resulting in streamlined recruitment, faster hiring, and better talent-to-opportunity connections."
                                 image={
                                     <FadeIn direction="X" distance="10%">
                                         <Box round="xsmall" overflow="hidden">
@@ -86,39 +104,19 @@ export default function Home() {
                                 }
                             />
                             <BaseContentSection
-                                subTitle={'Security & Privacy'}
-                                title={'Decentralized Data Storage'}
-                                paragraph="Decentralized data storage using Arbitrum and Ceramic is a modern approach that stores data across multiple nodes, reducing the risk of a single point of failure or data breach. Data is encrypted, enhancing user privacy, and only accessible with a private key. This solution provides a secure and cost-effective way to store sensitive data, making it an excellent option for businesses and individuals."
+                                title={'Future of Work Unlocked'}
+                                subTitle={'The Convergence of Web3 and AI'}
+                                paragraph="Integrating Web3 components into a unified platform leveraging AI streamlines user experience, revolutionizes work, and fosters value capture in the decentralized ecosystem."
                                 image={
-                                    <Box
-                                        direction="row"
-                                        wrap
-                                        fill
-                                        style={{ zIndex: 1 }}
-                                    >
-                                        <Box
-                                            flex
-                                            justify="center"
-                                            align="center"
-                                            pad="small"
-                                        >
-                                            <LogoButton
-                                                href="https://developer.arbitrum.io/intro/"
-                                                logoSrc="/images/logo/arbitrum_one_logo.svg"
+                                    <FadeIn direction="X" distance="10%">
+                                        <Box round="xsmall" overflow="hidden">
+                                            <Image
+                                                fit="contain"
+                                                fill
+                                                src="/illustrations/unified_web3_ai.svg"
                                             />
                                         </Box>
-                                        <Box
-                                            flex
-                                            justify="center"
-                                            align="center"
-                                            pad="small"
-                                        >
-                                            <LogoButton
-                                                href="https://ceramic.network/"
-                                                logoSrc="/images/logo/ceramic_logo.png"
-                                            />
-                                        </Box>
-                                    </Box>
+                                    </FadeIn>
                                 }
                                 anchor={<></>}
                             />

@@ -38,16 +38,16 @@ const USPListSection = () => {
             <Heading textAlign="center">
                 A New Era for Million-Sided Marketplaces
             </Heading>
-            <Box width={'xlarge'} pad="large">
+            <Box width={'xlarge'} pad="large" style={{ position: 'relative' }}>
                 <USPListItem
                     title="Solvers"
-                    description="Programmable escrow contracts that enable seamless technical interoperability for transactions."
+                    description="Escrow contracts that allow seamless technical interoperability in transactions."
                     icon={<PuzzlePiece />}
                 />
                 <PlainSectionDivider />
                 <USPListItem
                     title="Web3 Integration"
-                    description="Leveraging decentralized technologies to build a secure, transparent, and trustless marketplace."
+                    description="Using decentralized technologies to create a secure, transparent, and trustless marketplace."
                     icon={<CurrencyEth />}
                 />
                 <PlainSectionDivider />
@@ -60,7 +60,7 @@ const USPListSection = () => {
                             </Text>
                         </Box>
                     }
-                    description="Using artificial intelligence to personalize matches and streamline information processing across platforms."
+                    description="Leveraging AI for personalized matches and streamlined information processing across platforms."
                     icon={<Brain />}
                 />
                 <PlainSectionDivider />
@@ -75,11 +75,15 @@ const USPListSection = () => {
                     description="Enhanced security and user privacy through Arbitrum and Ceramic integration."
                     icon={<ShareNetwork />}
                 />
-                <PlainSectionDivider />
-                <USPListItem
-                    title="Flexible & Customizable"
-                    description="Adaptable to various use cases, industries, and individual needs."
-                    icon={<Palette />}
+                <Image
+                    src="/illustrations/twinkle.svg"
+                    style={{
+                        position: 'absolute',
+                        top: '20%',
+                        left: 0,
+                        opacity: '0.5',
+                        zIndex: 0,
+                    }}
                 />
             </Box>
         </Box>
