@@ -47,7 +47,7 @@ const USPListSection = () => {
                 <PlainSectionDivider />
                 <USPListItem
                     title="Web3 Native"
-                    description="Leveraging decentralized technologies to build a secure, transparent, and trustless marketplace."
+                    description="Decentralized technologies to build a secure, transparent, and trustless marketplace."
                     icon={<CurrencyEth />}
                 />
                 <PlainSectionDivider />
@@ -60,13 +60,13 @@ const USPListSection = () => {
                             </Text> */}
                         </Box>
                     }
-                    description="Leveraging AI for personalized matches and streamlined information processing across platforms."
+                    description="Bleeding-edge AI for personalized matches and streamlined information processing across platforms."
                     icon={<Brain />}
                 />
                 <PlainSectionDivider />
                 <USPListItem
                     title="No-Code Web App"
-                    description="A user-friendly platform that allows for easy Solver design, management, and collaboration."
+                    description="User-friendly platform that allows for easy Solver design, management, and collaboration."
                     icon={<Cursor />}
                 />
                 <PlainSectionDivider />
