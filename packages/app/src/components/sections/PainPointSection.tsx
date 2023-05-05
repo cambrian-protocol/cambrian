@@ -7,6 +7,7 @@ import USPCard from '../cards/USPCard'
 const PainPointSection = () => {
     return (
         <Box
+            id={'start'}
             height={{ min: '100vh' }}
             align="center"
             justify="center"
@@ -40,10 +41,10 @@ const PainPointSection = () => {
                             </Box>
                         }
                         title="Limited Interoperability"
-                        description="Traditional marketplaces often struggle to connect various platforms, protocols, and systems, leading to inefficiencies and missed opportunities."
+                        description="Traditional marketplaces struggle to connect platforms, protocols, and systems, resulting in inefficiencies and missed opportunities"
                     />
                 </FadeIn>
-                <FadeIn direction="Y" distance="0%">
+                <FadeIn direction="Y" distance="10%">
                     <USPCard
                         icon={<Database />}
                         title="Information Silos"
@@ -54,7 +55,7 @@ const PainPointSection = () => {
                     <USPCard
                         icon={<UsersFour />}
                         title="Lack of Personalization"
-                        description="Traditional marketplaces often fail to tailor experiences to individual users' needs, resulting in less effective matches and lower user satisfaction"
+                        description="Traditional marketplaces often lack personalized experiences, leading to less effective matches and lower user satisfaction"
                     />
                 </FadeIn>
             </Box>

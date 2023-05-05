@@ -5,6 +5,7 @@ import {
     NOTION_ENTRY_LINK,
     SUPPORT_DISCORD_LINK,
     TWITTER_PROFILE_LINK,
+    WHITEPAPER_LINK,
     WIKI_NOTION_LINK,
 } from 'packages/app/config/ExternalLinks'
 
@@ -45,6 +46,10 @@ const FooterLinksSection = () => (
                     <FooterLinksContainer
                         title="Company"
                         items={[
+                            {
+                                label: 'Whitepaper',
+                                href: WHITEPAPER_LINK,
+                            },
                             {
                                 label: 'Contact us',
                                 href: CONTACT_EMAIL_LINK,
