@@ -1,0 +1,70 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Arbitrator",
+  "sourceName": "contracts/modules/arbitration/Arbitrator.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract ISolver",
+          "name": "solver",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "conditionIndex",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "outcomes",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "arbitrate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract ISolver",
+          "name": "solver",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "conditionIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "arbitrateNull",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract ISolver",
+          "name": "solver",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "conditionIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "requestArbitration",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

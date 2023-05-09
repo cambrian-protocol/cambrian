@@ -1,0 +1,191 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ISolverFactory",
+  "sourceName": "contracts/interfaces/ISolverFactory.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "chainParent",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "chainIndex",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "contract Solver",
+              "name": "implementation",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "keeper",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "arbitrator",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timelockSeconds",
+              "type": "uint256"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "contract IModule",
+                  "name": "module",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct Modulated.Loader[]",
+              "name": "moduleLoaders",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "executions",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "enum SolverLib.IngestType",
+                  "name": "ingestType",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "slot",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "solverIndex",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct SolverLib.Ingest[]",
+              "name": "ingests",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "collateralToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "outcomeSlots",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "parentCollectionIndexSet",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "amountSlot",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "partition",
+                  "type": "uint256[]"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "bytes32",
+                      "name": "recipientAddressSlot",
+                      "type": "bytes32"
+                    },
+                    {
+                      "internalType": "bytes32[]",
+                      "name": "recipientAmountSlots",
+                      "type": "bytes32[]"
+                    }
+                  ],
+                  "internalType": "struct SolverLib.Allocation[]",
+                  "name": "allocations",
+                  "type": "tuple[]"
+                },
+                {
+                  "internalType": "string[]",
+                  "name": "outcomeURIs",
+                  "type": "string[]"
+                }
+              ],
+              "internalType": "struct SolverLib.ConditionBase",
+              "name": "conditionBase",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct SolverLib.Config",
+          "name": "solverConfig",
+          "type": "tuple"
+        }
+      ],
+      "name": "createSolver",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ctf",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "erc1155Rescue",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
