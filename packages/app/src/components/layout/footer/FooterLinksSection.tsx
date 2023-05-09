@@ -7,6 +7,7 @@ import {
     TWITTER_PROFILE_LINK,
     WHITEPAPER_LINK,
     WIKI_NOTION_LINK,
+    WRITINGS_NOTION_LINK,
 } from 'packages/app/config/ExternalLinks'
 
 import { Anchor } from 'grommet'
@@ -34,13 +35,13 @@ const FooterLinksSection = () => (
                                 href: SUPPORT_DISCORD_LINK,
                             },
                             {
-                                label: 'Learn',
-                                href: WIKI_NOTION_LINK,
+                                label: 'Blog',
+                                href: WRITINGS_NOTION_LINK,
                             },
-                            {
-                                label: 'Notion',
-                                href: NOTION_ENTRY_LINK,
-                            },
+                            // {
+                            //     label: 'Notion',
+                            //     href: NOTION_ENTRY_LINK,
+                            // },
                         ]}
                     />
                     <FooterLinksContainer
