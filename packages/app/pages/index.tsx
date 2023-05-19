@@ -18,6 +18,10 @@ export default function Home() {
     const { currentUser } = useCurrentUserContext()
 
     function handleClickHeaderCTA() {
+        window.location.href = 'https://ixogbfikyuz.typeform.com/to/V2L7GoTT'
+    }
+
+    function handleClickHeaderSecondary() {
         router.push('/freelancer')
     }
 
@@ -35,6 +39,7 @@ export default function Home() {
                 <Box style={{ position: 'relative' }} fill>
                     <IndexHeaderSection
                         onClickCTA={handleClickHeaderCTA}
+                        onClickSecondary={handleClickHeaderSecondary}
                         onClickArrow={handleClickHeaderArrow}
                     />
                     <Box>

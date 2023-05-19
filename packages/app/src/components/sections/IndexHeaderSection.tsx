@@ -10,10 +10,12 @@ import { WorldMap } from 'grommet'
 
 interface IndexHeaderSectionProps {
     onClickCTA: () => void
+    onClickSecondary: () => void
     onClickArrow: () => void
 }
 const IndexHeaderSection = ({
     onClickCTA,
+    onClickSecondary,
     onClickArrow,
 }: IndexHeaderSectionProps) => (
     <ResponsiveContext.Consumer>
@@ -58,9 +60,18 @@ const IndexHeaderSection = ({
                                 size="large"
                                 textAlign={isSmallScreen ? 'center' : 'start'}
                             >
-                                Sell services, freelance work and more for
-                                cryptocurrency on a free and decentralized
-                                platform.
+                                We're building an AI job engine for web3 and
+                                beyond. Sign up today and find your perfect
+                                match.
+                            </Text>
+                            <Text
+                                color="dark-4"
+                                size="large"
+                                textAlign={isSmallScreen ? 'center' : 'start'}
+                            >
+                                Don't want to wait? Sell services, freelance
+                                work and more for cryptocurrency on our free and
+                                decentralized platform now.
                             </Text>
                             <Box
                                 direction={isSmallScreen ? 'column' : 'row'}
@@ -68,13 +79,33 @@ const IndexHeaderSection = ({
                                 align="center"
                             >
                                 <Box
+                                    direction="row"
+                                    gap="small"
+                                    align="center"
+                                    pad={{
+                                        // horizontal: 'small',
+                                        vertical: 'small',
+                                    }}
+                                    justify="center"
+                                >
+                                    <Button
+                                        primary
+                                        label="Sign Up for Early Access"
+                                        onClick={onClickCTA}
+                                    />
+                                </Box>
+                                <Box
+                                    width={{ min: 'small' }}
+                                    height={{ min: 'auto' }}
+                                ></Box>
+                                <Box
                                     width={{ min: 'small' }}
                                     height={{ min: 'auto' }}
                                 >
                                     <Button
-                                        primary
-                                        label="Create your listing"
-                                        onClick={onClickCTA}
+                                        secondary
+                                        label="Create a Service"
+                                        onClick={onClickSecondary}
                                     />
                                 </Box>
                                 <Box
