@@ -23,8 +23,8 @@ const IndexHeaderSection = ({
             const isSmallScreen = screenSize === 'small'
             return (
                 <Box
-                    height="80vh"
-                    style={{ position: 'relative', overflow: 'hidden' }}
+                    height={{ min: '80vh' }}
+                    style={{ position: 'relative', overflow: 'visible' }}
                 >
                     <WorldMap
                         color="brand"
@@ -76,6 +76,10 @@ const IndexHeaderSection = ({
                             <Box
                                 direction={isSmallScreen ? 'column' : 'row'}
                                 gap={isSmallScreen ? 'large' : undefined}
+                                pad={{
+                                    horizontal: 'small',
+                                    vertical: 'small',
+                                }}
                                 align="center"
                             >
                                 <Box
@@ -94,13 +98,15 @@ const IndexHeaderSection = ({
                                         onClick={onClickCTA}
                                     />
                                 </Box>
-                                {/* <Box
-                                    width={{ min: 'small' }}
-                                    height={{ min: 'auto' }}
-                                ></Box> */}
                                 <Box
-                                    width={{ min: 'small' }}
-                                    height={{ min: 'auto' }}
+                                    direction="row"
+                                    gap="small"
+                                    align="center"
+                                    pad={{
+                                        horizontal: 'small',
+                                        vertical: 'small',
+                                    }}
+                                    justify="center"
                                 >
                                     <Button
                                         secondary
