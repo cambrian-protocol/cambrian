@@ -83,7 +83,7 @@ const IndexHeaderSection = ({
                                     gap="small"
                                     align="center"
                                     pad={{
-                                        // horizontal: 'small',
+                                        horizontal: 'small',
                                         vertical: 'small',
                                     }}
                                     justify="center"
@@ -94,10 +94,10 @@ const IndexHeaderSection = ({
                                         onClick={onClickCTA}
                                     />
                                 </Box>
-                                <Box
+                                {/* <Box
                                     width={{ min: 'small' }}
                                     height={{ min: 'auto' }}
-                                ></Box>
+                                ></Box> */}
                                 <Box
                                     width={{ min: 'small' }}
                                     height={{ min: 'auto' }}
